@@ -1,0 +1,3 @@
+/Users/dayz/CLionProjects/safari_mpi/build/CMakeFiles/safari.dir
+/Users/dayz/CLionProjects/safari_mpi/build/CMakeFiles/edit_cache.dir
+/Users/dayz/CLionProjects/safari_mpi/build/CMakeFiles/rebuild_cache.dir
