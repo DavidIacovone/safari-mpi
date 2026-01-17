@@ -411,6 +411,7 @@ int main(int argc, char **argv) {
     for (int dst = 0; dst < world; dst++) {
       if (dst == rank) continue; // do not send to ourselves
       MPI_Send(&m, 1, MPI_MSG, dst, 0, MPI_COMM_WORLD);
+      printf("[rank %d] REQ sent to rank %d trip=%d (lamport=%d)\n", rank, dst, trip, lamport);
     }
 
     // started==1 means we received/triggered START for our group.
@@ -439,6 +440,7 @@ int main(int argc, char **argv) {
         switch (rcv.type) {
 
           case MSG_REQ: {
+            printf("[rank %d] REQ received trip=%d (lamport=%d)\n", rank, trip, lamport);
             // Another process is requesting to join a tour.
             // Update our local request table so our queue snapshot includes them.
             int req_rank = rcv.a;
@@ -458,6 +460,7 @@ int main(int argc, char **argv) {
           } break;
 
           case MSG_ACK: {
+            printf("[rank %d] ACK received trip=%d (lamport=%d)\n", rank, trip, lamport);
             // ACK refers to a specific request (a=req_rank, b=req_ts).
             // We only count it if it acknowledges OUR current request.
             if (my_req_active && rcv.a == rank && rcv.b == my_req_ts) {
@@ -466,6 +469,7 @@ int main(int argc, char **argv) {
           } break;
 
           case MSG_INVITE: {
+            printf("[rank %d] INVITE received trip=%d (lamport=%d)\n", rank, trip, lamport);
             // A leader invites us to join their group instance.
             int leader = rcv.a;
             int leader_ts = rcv.b;
@@ -495,6 +499,7 @@ int main(int argc, char **argv) {
           } break;
 
           case MSG_READY: {
+            printf("[rank %d] READY received trip=%d (lamport=%d)\n", rank, trip, lamport);
             // READY is sent to a leader; only the leader cares.
             // In this implementation, READY contains (a=leader_rank, b=leader_req_ts).
             if (leader_waiting && my_req_active) {
@@ -506,6 +511,7 @@ int main(int argc, char **argv) {
           } break;
 
           case MSG_START: {
+            printf("[rank %d] START received trip=%d (lamport=%d)\n", rank, trip, lamport);
             // Leader signals that the tour should start for its group instance.
             int leader = rcv.a;
             int leader_ts = rcv.b;
@@ -518,6 +524,7 @@ int main(int argc, char **argv) {
           } break;
 
           case MSG_REL: {
+            printf("[rank %d] REL received trip=%d (lamport=%d)\n", rank, trip, lamport);
             // Someone finished and releases their request; remove them from our queue view.
             int rel_rank = rcv.a;
 
@@ -635,13 +642,13 @@ int main(int argc, char **argv) {
       // Randomly decide if beaten, then simulate hospital time.
       double r = frand01(&rng);
       if (r < beat_prob) {
-        printf("[rank %d] got BEATEN -> hospital %dms\n", rank, hospital_ms);
+        printf("[rank %d] got BEATEN -> hospital %dms (lamport=%d)\n", rank, hospital_ms, lamport);
         fflush(stdout);
         msleep(hospital_ms);
       }
 
       // Print end for debugging/observation.
-      printf("[rank %d] END trip=%d\n", rank, trip);
+      printf("[rank %d] END trip=%d (lamport=%d)\n", rank, trip, lamport);
       fflush(stdout);
     }
 

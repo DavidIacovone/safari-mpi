@@ -1,1 +1,0 @@
-/usr/bin/cc  -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/untitled.dir/hello_world.c.o -o untitled  /opt/homebrew/Cellar/open-mpi/5.0.9/lib/libmpi.dylib
